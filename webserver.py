@@ -27,11 +27,14 @@ class webServerHandler(BaseHTTPRequestHandler):
                 for restaurant in restaurants:
                     output += restaurant.name
                     output += "</br>"
-
+                    output += '''
+                            <a href="/restaurants">Edit</a></br>
+                            <a href="/restaurants">Delete</a></br></br></br></br>
+                    '''
                 output += "</body></html>"
                 self.wfile.write(output)
-
                 return
+
 
             elif self.path.endswith("/hello"):
                 
