@@ -31,8 +31,8 @@ class webServerHandler(BaseHTTPRequestHandler):
                     output += restaurant.name
                     output += "</br>"
                     output += '''
-                            <a href="/%s/edit">Edit</a></br>
-                            <a href="/%s/delete">Delete</a></br></br></br></br>
+                            <a href="/restaurants/%s/edit">Edit</a></br>
+                            <a href="/restaurants/%s/delete">Delete</a></br></br></br></br>
                     ''' % (restaurant.id, restaurant.id)
                 output += "</body></html>"
                 self.wfile.write(output)
@@ -56,9 +56,9 @@ class webServerHandler(BaseHTTPRequestHandler):
                 return
 
             elif self.path.endswith("/edit"):
-                restaurantID = self.path.split("/", 2)
-                print "RESTAURANTID=" + restaurantID[1]
-                restaurant = session.query(Restaurant).filter_by(id = restaurantID[1]).one()
+                restaurantID = self.path.split("/")
+                print "RESTAURANTID=" + restaurantID[2]
+                restaurant = session.query(Restaurant).filter_by(id = restaurantID[2]).one()
 
                 if restaurant != []:
                     self.send_response(200)
@@ -72,16 +72,16 @@ class webServerHandler(BaseHTTPRequestHandler):
                         <form method='POST' enctype='multipart/form-data' action='/restaurants/%s/edit'>
                             <input name="restaurantName" type="text" placeholder = "%s"><input type="submit" value="Rename">
                         </form>
-                        ''' % (restaurantID[1], restaurant.name)
+                        ''' % (restaurantID[2], restaurant.name)
 
                     output += "</body></html>"
                     self.wfile.write(output)
                 #return
 
             if self.path.endswith("/delete"):
-                restaurantID = self.path.split("/", 2)
-                print "RESTAURANTID=" + restaurantID[1]
-                restaurant = session.query(Restaurant).filter_by(id = restaurantID[1]).one()
+                restaurantID = self.path.split("/")
+                print "RESTAURANTID=" + restaurantID[2]
+                restaurant = session.query(Restaurant).filter_by(id = restaurantID[2]).one()
 
                 if restaurant != []:
                     self.send_response(200)
@@ -95,7 +95,7 @@ class webServerHandler(BaseHTTPRequestHandler):
                         <form method='POST' enctype='multipart/form-data' action='/restaurants/%s/delete'>
                             <input type="submit" value="Delete">
                         </form>
-                        ''' % (restaurantID[1])
+                        ''' % (restaurantID[2])
 
                     output += "</body></html>"
                     self.wfile.write(output)
