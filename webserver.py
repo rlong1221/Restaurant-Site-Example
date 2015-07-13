@@ -32,8 +32,8 @@ class webServerHandler(BaseHTTPRequestHandler):
                     output += "</br>"
                     output += '''
                             <a href="/%s/edit">Edit</a></br>
-                            <a href="/delete">Delete</a></br></br></br></br>
-                    ''' % restaurant.id
+                            <a href="/%s/delete">Delete</a></br></br></br></br>
+                    ''' % (restaurant.id, restaurant.id)
                 output += "</body></html>"
                 self.wfile.write(output)
                 return
@@ -78,23 +78,27 @@ class webServerHandler(BaseHTTPRequestHandler):
                     self.wfile.write(output)
                 #return
 
-            if self.path.endswith("restaurants/delete"):
-                self.send_response(200)
-                self.send_header('Content-type', 'text/html')
-                self.end_headers()
-                output = ""
-                output += "<html><body>"
+            if self.path.endswith("/delete"):
+                restaurantID = self.path.split("/", 2)
+                print "RESTAURANTID=" + restaurantID[1]
+                restaurant = session.query(Restaurant).filter_by(id = restaurantID[1]).one()
 
-                output += "<h1></h1>" 
-                output += '''
-                    <form method='POST' enctype='multipart/form-data' action='/restaurants/delete'>
-                        <input name="restaurantName" type="text" ><input type="submit" value="Delete">
-                    </form>
-                    '''
+                if restaurant != []:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    output = ""
+                    output += "<html><body>"
 
-                output += "</body></html>"
-                self.wfile.write(output)
-                return
+                    output += "<h1>Are you sure you want to delete %s?</h1>" % restaurant.name
+                    output += '''
+                        <form method='POST' enctype='multipart/form-data' action='/restaurants/%s/delete'>
+                            <input type="submit" value="Delete">
+                        </form>
+                        ''' % (restaurantID[1])
+
+                    output += "</body></html>"
+                    self.wfile.write(output)
 
             # elif self.path.endswith("/hello"):
                 
@@ -163,13 +167,34 @@ class webServerHandler(BaseHTTPRequestHandler):
                     fields = cgi.parse_multipart(self.rfile, pdict)
                 messagecontent = fields.get('restaurantName')
                 restaurantID = self.path.split("/")
-                print "RESTAURANTID=" + restaurantID[2]
                 restaurant = session.query(Restaurant).filter_by(id = restaurantID[2]).one()
 
                 if restaurant != []:
                     restaurant.name = messagecontent[0]
                     session.add(restaurant)
                     session.commit()
+
+                    self.send_response(301)
+                    self.send_header('Content-type', 'text/html')
+                    #Redirect back to restaurants
+                    self.send_header('Location', '/restaurants')
+                    self.end_headers()
+
+            elif self.path.endswith("/delete"):
+                ctype, pdict = cgi.parse_header(
+                    self.headers.getheader('content-type'))
+                if ctype == 'multipart/form-data':
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                #Smessagecontent = fields.get('restaurantName')
+                restaurantID = self.path.split("/")
+                restaurant = session.query(Restaurant).filter_by(id = restaurantID[2]).one()
+                print "RESTAURANTID=%s" % restaurant
+
+                if restaurant != []:
+                    session.delete(restaurant)
+                    print "Session Deleted"
+                    session.commit()
+                    print "Session Committed"
 
                     self.send_response(301)
                     self.send_header('Content-type', 'text/html')
