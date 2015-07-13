@@ -13,10 +13,9 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 #decorator / routes to the last decorator, /hello
-@app.route('/')
-@app.route('/hello')
+@app.route('/restaurants/<int:restaurant_id>/')
 #if the instances route from the above routes, do the following function
-def HelloWorld():
+def restaurantMenu(restaurant_id):
 	restaurant = session.query(Restaurant).first()
 	items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id)
 	output = ''
