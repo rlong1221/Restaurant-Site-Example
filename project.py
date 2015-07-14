@@ -51,7 +51,6 @@ def newMenuItem(restaurant_id):
 	
 	if request.method == 'POST':
 		newItem = MenuItem(name = request.form['name'], description = request.form['description'], price = request.form['price'], course = request.form['course'], restaurant_id = restaurant_id)
-		# (name="Chicken Burger", description="Juicy grilled chicken patty with tomato mayo and lettuce", price="$5.50", course="Entree", restaurant=restaurant1)
 		session.add(newItem)
 		session.commit()
 		flash("New menu item created!")
@@ -67,6 +66,7 @@ def editMenuItem(restaurant_id, menu_id):
 			editItem.name = request.form['name']
 		session.add(editItem)
 		session.commit()
+		flash("Menu item name changed!")
 		return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
 	else:
 		#USE THE RENDER_TEMPLATE FUNCTION BELOW TO SEE THE VARIABLES YOU SHOULD USE IN YOUR EDITMENUITEM TEMPLATE
@@ -79,6 +79,7 @@ def deleteMenuItem(restaurant_id, menu_id):
 	if request.method == 'POST':
 		session.delete(deleteItem)
 		session.commit()
+		flash("Menu item removed!")
 		return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
 	else:
 		#USE THE RENDER_TEMPLATE FUNCTION BELOW TO SEE THE VARIABLES YOU SHOULD USE IN YOUR EDITMENUITEM TEMPLATE
